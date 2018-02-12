@@ -51,14 +51,29 @@
     <input type="text" id="zoomlevel" v-model="mapProperty.zoom"><br>
 
     <label for="selectBox">Select Zoom</label>
-    <select id="selectBox" v-model="selected">
+    <select id="selectBox" v-model="selected" v-on:change="selectBoxOnChange">
       <option disabled value="">Please select one</option>
       <option value="akecil">A</option>
       <option value="bkecil">B</option>
       <option>C</option>
     </select>
-    <br>
     <span>Selected: {{ selected }}</span>
+    <br>
+
+    <!--<select v-model="selected">-->
+      <!--&lt;!&ndash; inline object literal &ndash;&gt;-->
+      <!--<option v-bind:value="{ number: 123 }">123</option>-->
+    <!--</select>-->
+    <!--// when selected:-->
+    <!--typeof vm.selected // => 'object'-->
+    <!--vm.selected.number // => 123-->
+    <!-- See Below -->
+    <br>
+    <select id="products" v-model="productSelected" v-on:change="productOnChange">
+      <option value="">Select first</option>
+      <option v-for="productOpt in productOpts" :value="{ id: productOpt.id }">{{ productOpt.name}}</option>
+    </select>
+    <span>Selected: {{ productSelected.id }}</span>
     <br>
 
     <button v-on:click="loadMap">Load Map</button>

@@ -18,6 +18,19 @@ var app = new Vue({
         appTitle: "<h2>Thematic Viewer</h2>",
         products: ["Socks"],
         selected: '',
+        productOpts: [
+            {
+                "id": "5a817223718b25bf277abe37",
+                "picture": "http://placehold.it/32x32",
+                "name": "Ester Mullins"
+            },
+            {
+                "id": "5a817223f58d1de40c6728cf",
+                "picture": "http://placehold.it/32x32",
+                "name": "Gaines Goodwin"
+            }
+        ],
+        productSelected: '',
         mapDataUrl: "https://api.myjson.com/bins/aa0nx",
         mapProperty: {
             lat: -96,
@@ -53,6 +66,20 @@ var app = new Vue({
             .catch(error => {
                 console.log(error);
             })
+        },
+        selectBoxOnChange() {
+            console.log("Hei im changed");
+            axios.get("https://api.myjson.com/bins/ucr6l")
+                .then(response => {
+                    this.productOpts = response.data;
+                    return this.productOpts
+                })
+                .catch(error => {
+                        console.log(error);
+                })
+        },
+        productOnChange() {
+            console.log(this.productSelected.id)
         }
     }
 });
