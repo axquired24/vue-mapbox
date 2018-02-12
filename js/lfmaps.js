@@ -1,59 +1,3 @@
-var app = new Vue({
-    el: '#app',
-    data: {
-        products: ["Socks"],
-        mapProperty: {
-            lat: -96,
-            lng: 37.8,
-            zoom: 4,
-            mapdata: {},
-            mapDataUrl: "https://api.myjson.com/bins/aa0nx"
-        },
-        mapSelector: {
-            mapTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-            mapID: 'map',
-            mapWrapperID: 'mapWrapper'
-        }
-    },
-    // mounted() {
-    //     axios.get("https://api.myjson.com/bins/aa0nx")
-    //         .then(response => {
-    //         this.mapdata = response.data;
-    //     console.log(this.mapdata);
-    // })},
-    methods: {
-        loadMap: function() {
-            console.log("Building Map ... ");
-            clearMapContainer(this.mapSelector);
-
-            axios.get(this.mapProperty.mapDataUrl)
-            .then(response => {
-                this.mapProperty.mapdata = response.data;
-
-                return this.mapProperty.mapdata;
-            })
-            .then(nodata => {
-                const dataToSend = {
-                    lat: this.mapProperty.lat,
-                    lng: this.mapProperty.lng,
-                    zoom: this.mapProperty.zoom,
-                    statesData: this.mapProperty.mapdata
-                }
-
-                runLeafletjs(this.mapSelector, dataToSend);
-            })
-        }
-    }
-});
-
-function clearMapContainer(mapSelector) {
-    var mapID = mapSelector.mapID;
-    var mapWrapperID = mapSelector.mapWrapperID;
-
-    // Remove old map
-    $('#' + mapWrapperID).html('<div id="'+mapID+'"></div>');
-}
-
 function runLeafletjs(mapSelector, data) {
     var mapTileLayer = mapSelector.mapTileLayer;
     var mapID = mapSelector.mapID;
@@ -61,7 +5,10 @@ function runLeafletjs(mapSelector, data) {
     var lat = data.lat;
     var lng = data.lng;
     var zoom = data.zoom;
-    var statesData = data.statesData;
+    var statesData = data.mapData;
+
+    // clear map from trash or old content
+    clearMapContainer(mapSelector);
 
     // Leaflet JS
     var map = L.map(mapID).setView([lng, lat], zoom);
@@ -79,7 +26,7 @@ function runLeafletjs(mapSelector, data) {
     var info = L.control();
 
     info.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info');
+        this._div = L.DomUtil.create('div', 'lfinfo');
         this.update();
         return this._div;
     };
@@ -164,7 +111,7 @@ function runLeafletjs(mapSelector, data) {
 
     legend.onAdd = function (map) {
 
-        var div = L.DomUtil.create('div', 'info legend'),
+        var div = L.DomUtil.create('div', 'lfinfo lflegend'),
             grades = [0, 10, 20, 50, 100, 200, 500, 1000],
             labels = [],
             from, to;
