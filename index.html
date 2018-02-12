@@ -48,7 +48,18 @@
     <span v-html="appTitle"></span>
 
     <label for="zoomlevel">Zoom Level</label>
-    <input type="text" id="zoomlevel" v-model="mapProperty.zoom">
+    <input type="text" id="zoomlevel" v-model="mapProperty.zoom"><br>
+
+    <label for="selectBox">Select Zoom</label>
+    <select id="selectBox" v-model="selected">
+      <option disabled value="">Please select one</option>
+      <option value="akecil">A</option>
+      <option value="bkecil">B</option>
+      <option>C</option>
+    </select>
+    <br>
+    <span>Selected: {{ selected }}</span>
+    <br>
 
     <button v-on:click="loadMap">Load Map</button>
 

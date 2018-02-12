@@ -17,6 +17,7 @@ var app = new Vue({
     data: {
         appTitle: "<h2>Thematic Viewer</h2>",
         products: ["Socks"],
+        selected: '',
         mapDataUrl: "https://api.myjson.com/bins/aa0nx",
         mapProperty: {
             lat: -96,
