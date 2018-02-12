@@ -87,6 +87,12 @@ function runLeafletjs(mapSelector, data) {
         info.update();
     }
 
+    function eachFeature(e) {
+        zoomToFeature(e);
+        console.log(e);
+        console.log(e.target.feature.properties.name)
+    }
+
     function zoomToFeature(e) {
         map.fitBounds(e.target.getBounds());
     }
@@ -95,7 +101,7 @@ function runLeafletjs(mapSelector, data) {
         layer.on({
             mouseover: highlightFeature,
             mouseout: resetHighlight,
-            click: zoomToFeature
+            click: eachFeature
         });
     }
 
