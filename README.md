@@ -6,3 +6,4 @@ using vue-js, leafletjs, mapbox and axios
 - hit `load map` button
 
 ### Preview
+![App Preview](https://raw.githubusercontent.com/axquired24/vue-mapbox/master/preview-vue.png)
