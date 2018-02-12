@@ -2,12 +2,18 @@ var app = new Vue({
     el: '#app',
     data: {
         products: ["Socks"],
-        lat: -96,
-        lng: 37.8,
-        zoom: 4,
-        mapdata: {},
-        mapID: 'map',
-        mapWrapperID: 'mapWrapper'
+        mapProperty: {
+            lat: -96,
+            lng: 37.8,
+            zoom: 4,
+            mapdata: {},
+            mapDataUrl: "https://api.myjson.com/bins/aa0nx"
+        },
+        mapSelector: {
+            mapTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
+            mapID: 'map',
+            mapWrapperID: 'mapWrapper'
+        }
     },
     // mounted() {
     //     axios.get("https://api.myjson.com/bins/aa0nx")
@@ -18,52 +24,49 @@ var app = new Vue({
     methods: {
         loadMap: function() {
             console.log("Building Map ... ");
+            clearMapContainer(this.mapSelector);
 
-            axios.get("https://api.myjson.com/bins/aa0nx")
+            axios.get(this.mapProperty.mapDataUrl)
             .then(response => {
-                this.mapdata = response.data;
-                console.log(this.mapdata);
+                this.mapProperty.mapdata = response.data;
 
-                return this.mapdata;
+                return this.mapProperty.mapdata;
             })
-            .then(data => {
-                console.log("then kedua");
-                console.log(data);
-
+            .then(nodata => {
                 const dataToSend = {
-                    lat: this.lat,
-                    lng: this.lng,
-                    zoom: this.zoom,
-                    statesData: this.mapdata
+                    lat: this.mapProperty.lat,
+                    lng: this.mapProperty.lng,
+                    zoom: this.mapProperty.zoom,
+                    statesData: this.mapProperty.mapdata
                 }
 
-                const mapSelector = {
-                    mapID: this.mapID,
-                    mapWrapperID: this.mapWrapperID
-                }
-                runLeafletjs(mapSelector, dataToSend);
+                runLeafletjs(this.mapSelector, dataToSend);
             })
         }
     }
 });
 
-
-function runLeafletjs(mapSelector, data) {
+function clearMapContainer(mapSelector) {
     var mapID = mapSelector.mapID;
     var mapWrapperID = mapSelector.mapWrapperID;
+
+    // Remove old map
+    $('#' + mapWrapperID).html('<div id="'+mapID+'"></div>');
+}
+
+function runLeafletjs(mapSelector, data) {
+    var mapTileLayer = mapSelector.mapTileLayer;
+    var mapID = mapSelector.mapID;
 
     var lat = data.lat;
     var lng = data.lng;
     var zoom = data.zoom;
     var statesData = data.statesData;
 
-    // Remove old map
-    $('#' + mapWrapperID).html('<div id="'+mapID+'"></div>');
-
     // Leaflet JS
     var map = L.map(mapID).setView([lng, lat], zoom);
 
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+    L.tileLayer(mapTileLayer, {
         maxZoom: 18,
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
         '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
