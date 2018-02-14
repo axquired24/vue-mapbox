@@ -19,6 +19,44 @@
        folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="lte/dist/css/skins/_all-skins.min.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin="" />
+    <style>
+        #map {
+            min-width: 500px;
+            width: 100%;
+            height: 80vh;
+        }
+    
+        .lfinfo {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+    
+        .lfinfo h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+    
+        .lflegend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+    
+        .lflegend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -679,39 +717,46 @@
                                 <h3 class="box-title">Judul Konten</h3>
                             </div>
                             <div class="box-body">
-                                <div class="form-group">
-                                    <label>Select Group</label>
-                                    <select class="form-control" v-model="productSelected" @change="selectBoxOnChange">
-                                        <option v-for="pr in productOpts" :value="{ id: pr.id }">{{ pr.name }}</option>
-                                    </select>
-                                </div>
+                                <form action="" id="filterForm" @submit.prevent="loadMap()">
+                                    <div class="form-group">
+                                        <label>Select Group</label>
+                                        <select class="form-control" v-model="productSelected" @change="selectBoxOnChange">
+                                            <option v-for="pr in productOpts" :value="{ id: pr.id }">{{ pr.name }}</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Select Group</label>
+                                        <select class="form-control" v-model="cartSelected">
+                                            <option v-for="prd in cartOpts" :value="{ id: prd.id }">{{ prd.name }}</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Select Group</label>
+                                        <select id="testrequired" class="form-control" required>
+                                            <option value="">option 1</option>
+                                            <option>option 2</option>
+                                            <option>option 3</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Select Group</label>
+                                        <select class="form-control" v-model="vprogressbar">
+                                            <option v-for="vprogress in vproggresbaropts">{{ vprogress }}</option>
+                                        </select>
+                                    </div>
 
-                                <div class="form-group">
-                                    <label>Select Group</label>
-                                    <select class="form-control" v-model="cartSelected">
-                                        <option v-for="prd in cartOpts" :value="{ id: prd.id }">{{ prd.name }}</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Select Group</label>
-                                    <select class="form-control">
-                                        <option>option 1</option>
-                                        <option>option 2</option>
-                                        <option>option 3</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Select Group</label>
-                                    <select class="form-control" v-model="vprogressbar">
-                                        <option v-for="vprogress in vproggresbaropts">{{ vprogress }}</option>                                    
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <button class="btn btn-danger" type="submit">Submit</button>
-                                </div>
+                                    <div class="form-group">
+                                        <label>Chrome in PieChart</label>
+                                        <input type="number" id="chromePie" class="form-control" v-model="pieChart.data[0].value" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button class="btn btn-danger" type="submit">Submit</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -720,8 +765,10 @@
                             <!-- <div class="box-header">
                                 <h3 class="box-title">Streaming</h3>
                             </div> -->
-                            <div class="box-body">
-                                <h5>LOADING..</h5>
+                            <div class="box-body" id="mapWrapper">
+                                <div id="map">
+                                    <h5>LOADING..</h5>
+                                </div>
                             </div>
                         </div>                    
                     </div>
@@ -729,7 +776,7 @@
                 <!-- /.row -->
 
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <div class="box box-danger">
                             <div class="box-header">
                                 <h3 class="box-title">Goal</h3>
@@ -778,6 +825,78 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <div class="box box-default">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Browser Usage</h3>
+                        
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div id="pieChartWrapper" class="chart-responsive">
+                                            <canvas id="pieChart" height="150"></canvas>
+                                        </div>
+                                        <!-- ./chart-responsive -->
+                                    </div>
+                                    <!-- /.col -->
+                                    <div class="col-md-4">
+                                        <ul class="chart-legend clearfix">
+                                            <li>
+                                                <i class="fa fa-circle-o text-red"></i> Chrome</li>
+                                            <li>
+                                                <i class="fa fa-circle-o text-green"></i> IE</li>
+                                            <li>
+                                                <i class="fa fa-circle-o text-yellow"></i> FireFox</li>
+                                            <li>
+                                                <i class="fa fa-circle-o text-aqua"></i> Safari</li>
+                                            <li>
+                                                <i class="fa fa-circle-o text-light-blue"></i> Opera</li>
+                                            <li>
+                                                <i class="fa fa-circle-o text-gray"></i> Navigator</li>
+                                        </ul>
+                                    </div>
+                                    <!-- /.col -->
+                                </div>
+                                <!-- /.row -->
+                            </div>
+                            <!-- /.box-body -->
+                            <div class="box-footer no-padding">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li>
+                                        <a href="#">United States of America
+                                            <span class="pull-right text-red">
+                                                <i class="fa fa-angle-down"></i> 12%</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">India
+                                            <span class="pull-right text-green">
+                                                <i class="fa fa-angle-up"></i> 4%</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">China
+                                            <span class="pull-right text-yellow">
+                                                <i class="fa fa-angle-left"></i> 0%</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.footer -->
+                        </div>
+                        <!-- /.box -->
+                    </div>
                 </div>
                 <!-- /.row -->
 
@@ -819,7 +938,13 @@
     <!-- ChartJS -->
     <script src="lte/bower_components/chart.js/Chart.js"></script>
 
+     <!-- Leaflet JS - Map Builder -->
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+
     <!-- Core apps -->
+    <script src="js/appdata.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/lfmaps.js"></script>
     <script src="js/ltevue/index.js"></script>
 </body>
 
