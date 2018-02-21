@@ -6,13 +6,14 @@ function createLegendRange(densities) {
     var rangeLength = 7;
 
     var avg = Math.floor(sum / densities.length);
+    var diffEach = Math.floor(max / rangeLength);
 
-    console.log("Max: " + max + " | Avg: " + avg);
+    console.log("Max: " + max + " | Avg: " + avg + " | DiffEach: " + diffEach);
 
     var range = [0];
 
     for (var i = 1; i <= rangeLength; i++) {
-        range.push(avg * i);
+        range.push(diffEach * i);
     }
 
     return range.reverse();
