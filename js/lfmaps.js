@@ -1,3 +1,24 @@
+function createLegendRange(densities) {
+    // accepted format: [1000, 500, 200, 100, 50, 20, 10, 0]
+    // 7 number with 1 zero (0)
+    var max = _.max(densities);
+    var sum = _.sum(densities);
+    var rangeLength = 7;
+
+    var avg = Math.floor(sum / densities.length);
+
+    console.log("Max: " + max + " | Avg: " + avg);
+
+    var range = [0];
+
+    for (var i = 1; i <= rangeLength; i++) {
+        range.push(avg * i);
+    }
+
+    return range.reverse();
+    // return [1000, 500, 200, 100, 50, 20, 10, 0];
+}
+
 function runLeafletjs(mapSelector, data) {
     var mapTileLayer = mapSelector.mapTileLayer;
     var mapID = mapSelector.mapID;
@@ -6,6 +27,20 @@ function runLeafletjs(mapSelector, data) {
     var lng = data.lng;
     var zoom = data.zoom;
     var statesData = data.mapData;
+
+    var densities = _.map(data.mapData.features, function (item) {
+        return item.properties.density;
+    });
+
+    var lRange = createLegendRange(densities);
+    var lGrades = lRange.slice();
+    lGrades.reverse();
+
+    const mapDensities = _.map(statesData.features, function(item) {
+        return item.properties.density;
+    });
+
+    const maxDensity = _.max(mapDensities);
 
     // clear map from trash or old content
     clearMapContainer(mapSelector);
@@ -42,13 +77,15 @@ function runLeafletjs(mapSelector, data) {
 
     // get color depending on population density value
     function getColor(d) {
-        return d > 1000 ? '#800026' :
-            d > 500  ? '#BD0026' :
-                d > 200  ? '#E31A1C' :
-                    d > 100  ? '#FC4E2A' :
-                        d > 50   ? '#FD8D3C' :
-                            d > 20   ? '#FEB24C' :
-                                d > 10   ? '#FED976' :
+        const range = lRange;
+
+        return d > range[0] ? '#800026' :
+            d > range[1]  ? '#BD0026' :
+                d > range[2]  ? '#E31A1C' :
+                    d > range[3]  ? '#FC4E2A' :
+                        d > range[4]   ? '#FD8D3C' :
+                            d > range[5]   ? '#FEB24C' :
+                                d > range[6]   ? '#FED976' :
                                     '#FFEDA0';
     }
 
@@ -118,7 +155,7 @@ function runLeafletjs(mapSelector, data) {
     legend.onAdd = function (map) {
 
         var div = L.DomUtil.create('div', 'lfinfo lflegend'),
-            grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+            grades = lGrades,
             labels = [],
             from, to;
 

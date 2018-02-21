@@ -37,6 +37,7 @@ var app = new Vue({
             lng: 37.8,
             zoom: 4,
             mapData: {},
+            densities: []
         },
         mapSelector: {
             mapTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
@@ -58,10 +59,9 @@ var app = new Vue({
             .then(response => {
                 this.mapProperty.mapData = response.data;
 
-                return this.mapProperty.mapData;
-            })
-            .then(nodata => {
                 runLeafletjs(this.mapSelector, this.mapProperty);
+
+                return this.mapProperty.mapData;
             })
             .catch(error => {
                 console.log(error);
