@@ -83,6 +83,12 @@
     </div>
 
     <hr>
+    <h4>Detail (diurutkan dari yang tertinggi)</h4>
+    <ul>
+      <li v-for="m in mapProperty.details">{{ m.name }} -> {{ m.density }} / {{ mapProperty.densityTotal }}</li>
+    </ul>
+
+    <hr>
     <ax-message></ax-message>
     <ax-alert></ax-alert>
   </div>

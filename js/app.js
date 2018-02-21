@@ -37,7 +37,8 @@ var app = new Vue({
             lng: 37.8,
             zoom: 4,
             mapData: {},
-            densities: []
+            details: [],
+            densityTotal: 0
         },
         mapSelector: {
             mapTileLayer: "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
@@ -58,6 +59,21 @@ var app = new Vue({
             axios.get(this.mapDataUrl)
             .then(response => {
                 this.mapProperty.mapData = response.data;
+
+                this.mapProperty.details = _.map(response.data.features, function(item) {
+                    return {
+                        name: item.properties.name,
+                        density: item.properties.density
+                    }
+                });
+
+                this.mapProperty.details = _.sortBy(this.mapProperty.details, function(item) {
+                    return item.density;
+                }).reverse();
+
+                this.mapProperty.densityTotal = _.sumBy(this.mapProperty.details, function(item) {
+                    return item.density;
+                }).toFixed(2)
 
                 runLeafletjs(this.mapSelector, this.mapProperty);
 
