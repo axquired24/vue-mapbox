@@ -7,9 +7,9 @@ var axconfig = {
         // Number - The width of each segment stroke
         segmentStrokeWidth: 1,
         // Number - The percentage of the chart that we cut out of the middle
-        percentageInnerCutout: 50, // This is 0 for Pie charts
+        percentageInnerCutout: 70, // This is 0 for Pie charts
         // Number - Amount of animation steps
-        animationSteps: 100,
+        animationSteps: 60,
         // String - Animation easing effect
         animationEasing: 'easeOutBounce',
         // Boolean - Whether we animate the rotation of the Doughnut

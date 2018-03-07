@@ -687,7 +687,7 @@
                     </div>
                 </div>
                 <div class="row loading-pie" style="display:none"><h2 align="center">L O A D I N G ...</h2></div>
-                <div class="row chart-content">
+                <div class="row chart-content" style="display:none">
                     <div class="col-md-3" v-for="c in chartMulti">
                         <div class="box box-danger">
                             <div class="box-header with-border">
@@ -697,6 +697,18 @@
                                 <div :id="'pieChartWrapper' + c.id" class="chart-responsive">
                                     <canvas :id="'pieChart' + c.id" height="150"></canvas>
                                 </div>
+                                <hr>
+                                <!-- Proggress Bar -->
+                                <div class="progress-group" v-for="csub in c.subwil">
+                                    <span class="progress-text">{{ csub.label }} <small>({{ csub.value }}%)</small></span>
+                                    <span class="progress-number">
+                                        <b>{{ csub.realvalue }}</b> Pieces</span>
+                                
+                                    <div class="progress sm">
+                                        <div class="progress-bar" :style="{ width: Math.round(csub.value) + '%', background: csub.color }"></div>
+                                    </div>
+                                </div>
+                                <!-- End Proggress Bar -->                                
                             </div>
                         </div>
                     </div>

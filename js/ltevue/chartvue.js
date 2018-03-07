@@ -6,7 +6,19 @@ var app = new Vue({
             wrapperID: 'pieChartWrapper',
             containerID: 'pieChart'
         },
-        chartMulti: [],
+        chartMulti: [
+            {
+                id: "ax024",
+                name: "no-name",
+                subwil: [
+                    {
+                        label: "no-label",
+                        value: 0,
+                        percentage: 0,
+                    }
+                ],
+            }
+        ],
         pieDataUrl: "https://api.myjson.com/bins/e610p"
     },
     mounted() {
@@ -18,19 +30,30 @@ var app = new Vue({
 
             axios.get(this.pieDataUrl)
                 .then(response => {
-                    this.chartMulti = response.data;
-                    return this.chartMulti;
-                }).then(chartMulti => {
-                    _.each(chartMulti, function(item) {
-                        var pieData = _.map(item.subwil, function(subwilItem) {
-                            var pieColor = getRandomColor();
+                    this.chartMulti = _.map(response.data, function(item){
+                        var subwilVar = _.map(item.subwil, function (subitem) {
+                            // swap percentage as value, value as realvalue
                             return {
-                                value: subwilItem.percentage,
-                                color: pieColor,
-                                label: subwilItem.label
+                                value: subitem.percentage,
+                                realvalue: subitem.value,
+                                color: getRandomColor(),
+                                label: subitem.label
                             }
                         });
-                        
+
+                        subwilVar = _.sortBy(subwilVar, function(subitem) {
+                            return subitem.value;
+                        }).reverse();
+
+                        return {
+                            id: item.id,
+                            name: item.name,
+                            subwil: subwilVar
+                        };
+                    });
+                    return this.chartMulti;
+                }).then(chartMulti => {
+                    _.map(chartMulti, function(item) {                      
                         var wrapperID = 'pieChartWrapper' + item.id;
                         var containerID = 'pieChart' + item.id;
 
@@ -39,7 +62,7 @@ var app = new Vue({
                         $('.chart-content').show();
 
                         // BuildChart
-                        buildPieChart(pieData, axconfig, wrapperID, containerID);
+                        buildPieChart(item.subwil, axconfig, wrapperID, containerID);
                     });
                 })
                 .catch(error => {
