@@ -2,6 +2,7 @@ var app = new Vue({
     el: '#app',
     data: {
         selected: '',
+        isFilterVisible: false,
         vprogressbar: 80,
         vproggresbaropts: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         productOpts: defaultData.loadingOpts,
@@ -41,6 +42,13 @@ var app = new Vue({
             })
         },
     methods: {
+        toggleFilter: function() {
+            this.isFilterVisible = this.isFilterVisible ? false : true;
+        },
+        mapBoxClass: function() {
+            var retCls = this.isFilterVisible ? 'col-md-9' : 'col-md-12';
+            return retCls;
+        },
         loadMap: function () {
             showMapLoading(this.mapSelector);
 

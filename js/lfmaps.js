@@ -57,6 +57,11 @@ function runLeafletjs(mapSelector, data) {
         id: 'mapbox.light'
     }).addTo(map);
 
+    // add custom button control to Map
+    L.easyButton('fa-filter', function (btn, map) {
+        app.toggleFilter();
+    }).addTo(map);
+
 
     // control that shows state info on hover
     var info = L.control();
